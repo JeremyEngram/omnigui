@@ -1,0 +1,71 @@
+import os
+import subprocess
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox
+
+class ScriptManager:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Script Manager")
+        self.script_directories = ["/opt", "/usr/local/bin"]
+
+        # Create widgets
+        self.create_widgets()
+
+        # Load script list
+        self.load_scripts()
+
+    def create_widgets(self):
+        self.main_frame = ttk.Frame(self.root, padding="10")
+        self.main_frame.grid(row=0, column=0, sticky="NSEW")
+
+        self.script_listbox = tk.Listbox(self.main_frame, width=50, height=10)
+        self.script_listbox.grid(row=0, column=0, columnspan=3, padx=(0, 10), pady=(0, 10))
+
+        self.load_button = ttk.Button(self.main_frame, text="Load Scripts", command=self.load_scripts)
+        self.load_button.grid(row=1, column=0, sticky="W")
+
+        self.run_button = ttk.Button(self.main_frame, text="Run", command=self.run_script)
+        self.run_button.grid(row=1, column=1)
+
+        self.output_text = tk.Text(self.main_frame, wrap="word", height=10, width=80)
+        self.output_text.grid(row=2, column=0, columnspan=3, padx=(0, 10), pady=(0, 10))
+
+    def load_scripts(self):
+        self.script_listbox.delete(0, tk.END)
+        scripts = self.find_scripts()
+        for script in scripts:
+            self.script_listbox.insert(tk.END, script)
+
+    def find_scripts(self):
+        scripts = []
+        for directory in self.script_directories:
+            try:
+                for entry in os.scandir(directory):
+                    if entry.is_file() and os.access(entry.path, os.X_OK):
+                        scripts.append(entry.path)
+            except FileNotFoundError:
+                pass
+
+        return scripts
+
+    def run_script(self):
+        selected_script = self.script_listbox.get(tk.ACTIVE)
+        if not selected_script:
+            messagebox.showerror("Error", "No script selected.")
+            return
+
+        try:
+            process = subprocess.Popen(selected_script, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            stdout, stderr = process.communicate()
+            output = f"Command: {selected_script}\n\nStandard Output:\n{stdout}\n\nStandard Error:\n{stderr}"
+            self.output_text.delete("1.0", tk.END)
+            self.output_text.insert(tk.END, output)
+        except Exception as e:
+            messagebox.showerror("Error", f"Error executing script: {str(e)}")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ScriptManager(root)
+    root.mainloop()
+

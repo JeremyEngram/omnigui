@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=omnisint ui
+Comment=omnisint script gui
+Exec=python3 /usr/local/bin/omnigui/omnisint_script_ui.py
+Icon=albion-online
+Path=/usr/local/bin/
+Terminal=false
+StartupNotify=false

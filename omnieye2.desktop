@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=omnieye2
+Comment=omnieye2
+Exec=python3 /usr/local/bin/omnigui/omnieye2
+Icon=albion-online
+Path=/usr/local/bin/omnigui/
+Terminal=false
+StartupNotify=false
